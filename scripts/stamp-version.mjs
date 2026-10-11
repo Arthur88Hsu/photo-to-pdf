@@ -8,7 +8,7 @@ import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-/** index.html：本站的 .css／.js 加上版本號，並把頁尾的版本換成實際版本 */
+/** HTML：本站的 .css／.js 加上版本號，並把頁尾的版本換成實際版本 */
 export function stampHtml(html, version) {
   let count = 0;
   const stamped = html
@@ -35,10 +35,14 @@ function main(dir, version) {
     console.error('用法：node scripts/stamp-version.mjs <網站資料夾> <版本>');
     process.exit(1);
   }
-  const htmlPath = path.join(dir, 'index.html');
-  const html = stampHtml(readFileSync(htmlPath, 'utf8'), version);
-  if (html.count === 0) throw new Error('index.html 裡找不到要加版本號的 CSS／JS');
-  writeFileSync(htmlPath, html.html);
+  let resources = 0;
+  for (const name of readdirSync(dir).filter((file) => file.endsWith('.html'))) {
+    const file = path.join(dir, name);
+    const html = stampHtml(readFileSync(file, 'utf8'), version);
+    writeFileSync(file, html.html);
+    resources += html.count;
+  }
+  if (resources === 0) throw new Error('HTML 裡找不到要加版本號的 CSS／JS');
 
   let imports = 0;
   const jsDir = path.join(dir, 'js');
@@ -48,7 +52,7 @@ function main(dir, version) {
     writeFileSync(file, result.source);
     imports += result.count;
   }
-  console.log(`版本 ${version}：index.html ${html.count} 個資源、JS ${imports} 個 import 已加上版本號`);
+  console.log(`版本 ${version}：HTML ${resources} 個資源、JS ${imports} 個 import 已加上版本號`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

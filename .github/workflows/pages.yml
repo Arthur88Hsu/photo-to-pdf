@@ -60,6 +60,10 @@ jobs:
         with:
           node-version: 24
 
+      # 依 adsense.json 設定 Google AdSense；沒填發布商 ID 時網站完全不變
+      - name: Configure ads
+        run: node scripts/configure-ads.mjs site adsense.json
+
       # 為 CSS、JS 網址加上這次的版本號，避免瀏覽器把新版 HTML 搭配到快取中的舊版 JS／CSS
       - name: Stamp version
         run: node scripts/stamp-version.mjs site "${GITHUB_SHA::7}"

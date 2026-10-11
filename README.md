@@ -18,14 +18,16 @@
 ## 隱私
 
 - 所有處理都在瀏覽器中完成，**照片不會上傳到任何伺服器**
-- 網頁設定了 Content-Security-Policy `connect-src 'none'`，瀏覽器會直接阻擋這個網頁發出任何網路連線
-- 不使用任何第三方函式庫、CDN、追蹤或分析服務；PDF 產生、透視校正、邊緣偵測都是專案內自行實作，零相依套件
+- 不使用任何第三方函式庫或 CDN；PDF 產生、透視校正、邊緣偵測都是專案內自行實作，零相依套件
+- **未啟用廣告時**：網頁設定了 Content-Security-Policy `connect-src 'none'`，瀏覽器會直接阻擋這個網頁發出任何網路連線，也沒有任何追蹤或分析服務
+- **啟用 Google AdSense 後**（見下方「廣告」）：工具頁會載入 Google 的廣告程式，安全設定只保留不影響廣告的部分（`object-src`、`base-uri`、`form-action`），頁面上的說明文字與[隱私權政策](site/privacy.html)會自動改成有廣告的版本。照片仍然不會被本站上傳或提供給任何人
 
 ## 專案結構
 
 ```
 site/                      網站本體（GitHub Pages 只發布這個資料夾）
-├── index.html
+├── index.html             工具頁
+├── privacy.html           隱私權政策
 ├── favicon.svg
 ├── css/style.css
 └── js/
@@ -39,7 +41,10 @@ site/                      網站本體（GitHub Pages 只發布這個資料夾�
     ├── image.js           照片讀取與畫布工具
     ├── documents.js       證件種類與尺寸
     └── format.js          日期、浮水印文字、檔名
-scripts/stamp-version.mjs  部署時為 CSS、JS 網址加上版本號（避免快取到舊檔）
+scripts/
+├── configure-ads.mjs      部署時依 adsense.json 設定 Google AdSense
+└── stamp-version.mjs      部署時為 CSS、JS 網址加上版本號（避免快取到舊檔）
+adsense.json               AdSense 發布商 ID 與廣告單元 ID（空白＝不放廣告）
 tests/                     單元測試（Node.js 內建 test runner）
 .github/workflows/pages.yml  GitHub Actions：測試 → 部署
 ```
@@ -85,7 +90,7 @@ npm test
 | 手動執行（Actions → Run workflow） | ✅ | ✅（在 `main` 上執行時） |
 
 - **Unit tests**：以 Node.js 執行 `npm test`；測試失敗就不會部署。
-- **Deploy to GitHub Pages**：先替 CSS、JS 網址加上這次的版本號（例如 `app.js?v=df37eaa`），再只把 `site/` 資料夾打包上傳並部署；權限只開 `pages: write` 與 `id-token: write`。
+- **Deploy to GitHub Pages**：依 `adsense.json` 設定廣告、替 CSS、JS 網址加上這次的版本號（例如 `app.js?v=df37eaa`），再只把 `site/` 資料夾打包上傳並部署；權限只開 `pages: write` 與 `id-token: write`。
 - **concurrency**：同一時間只會有一個部署在跑，進行中的部署不會被中斷。
 
 ### 常見問題
@@ -96,6 +101,48 @@ npm test
 - **`Unable to resolve action`**：表示指定的 action 版本不存在，把該行的版本號改回前一版（例如 `@v5` 改 `@v4`）即可。
 - **部署成功但網頁沒更新**：瀏覽器可能還在用快取的舊網頁，重新整理即可。頁尾會顯示目前載入的版本（commit 前 7 碼），可以和最新的 commit 對照。
 - **更新後畫面錯亂、按鈕沒反應**：新版網頁搭配到快取中的舊版 JS／CSS 才會這樣。部署時已自動在網址加上版本號避免這個問題；若仍發生，關掉分頁重新開啟即可。
+
+## 廣告：Google AdSense ＋ 自訂網域
+
+AdSense 只接受頂層網域，`ads.txt` 也必須放在網域根目錄，所以要先替網站綁定自訂網域。
+
+### 1. 綁定自訂網域
+
+1. 向任一網域商購買網域（例如 `example.com` 或 `example.tw`）。
+2. 在網域商的 DNS 設定新增下列紀錄：
+
+   | 類型 | 名稱 | 值 |
+   | --- | --- | --- |
+   | A | `@` | `185.199.108.153` |
+   | A | `@` | `185.199.109.153` |
+   | A | `@` | `185.199.110.153` |
+   | A | `@` | `185.199.111.153` |
+   | CNAME | `www` | `arthur88hsu.github.io` |
+
+3. 到 repo 的 **Settings → Pages → Custom domain** 輸入網域（例如 `example.com`）並按 **Save**，等 DNS 檢查通過後勾選 **Enforce HTTPS**。
+   使用 GitHub Actions 部署時不需要 `CNAME` 檔案。
+
+完成後網站會在 `https://example.com/`，`ads.txt` 會在 `https://example.com/ads.txt`。
+
+### 2. 申請 AdSense
+
+1. 到 <https://adsense.google.com> 用自訂網域申請，取得發布商 ID（`ca-pub-` 加 16 位數字）。
+2. 把 ID 填進 `adsense.json` 的 `publisherId`，push 到 `main`。部署時會自動加上網站驗證程式碼與 `ads.txt`。
+3. 回到 AdSense 確認網站並送出審核，通常需要幾天到 2～4 週。審核期間不要移除網站重新申請，會拖慢審核。
+
+### 3. 審核通過後放上廣告
+
+1. 在 AdSense 的 **廣告 → 依廣告單元 → 多媒體廣告** 建立一個「回應式」廣告單元，複製程式碼中的 `data-ad-slot`（10 位數字）。
+2. 填進 `adsense.json` 的 `adSlot`，push 到 `main`，工具頁「版面設定」下方就會出現廣告。
+
+```json
+{
+  "publisherId": "ca-pub-1234567890123456",
+  "adSlot": "1234567890"
+}
+```
+
+> 注意：不要點擊自己網站的廣告，也不要請別人點擊，否則 AdSense 帳號可能被停權。收益累積到 100 美元才會付款。
 
 ## 證件尺寸
 

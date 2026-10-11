@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <!-- 禁止任何網路連線（connect-src 'none'）：照片只在瀏覽器內處理，技術上不可能被上傳 -->
+    <!-- 禁止任何網路連線（connect-src 'none'）：照片只在瀏覽器內處理，技術上不可能被上傳。
+         若在 adsense.json 啟用廣告，部署時會由 scripts/configure-ads.mjs 放寬這項設定。 -->
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
@@ -216,6 +217,17 @@
             <span>黑白輸出</span>
           </label>
         </section>
+
+        <!-- 廣告版位：adsense.json 設定了廣告單元（adSlot）才會在部署時顯示 -->
+        <aside class="ad-slot" data-ad-unit hidden aria-label="廣告">
+          <p class="ad-slot__label">廣告</p>
+          <ins
+            class="adsbygoogle"
+            data-ad-client="" data-ad-slot=""
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+          ></ins>
+        </aside>
       </div>
 
       <aside class="panel layout__side" aria-labelledby="preview-title">
@@ -240,10 +252,37 @@
       </aside>
     </main>
 
+    <section class="container faq" aria-labelledby="faq-title">
+      <div class="panel">
+        <h2 id="faq-title" class="panel__title">常見問題</h2>
+        <details class="faq__item">
+          <summary>照片會上傳到網路上嗎？</summary>
+          <p>不會。從裁切、拉正、加浮水印到產生 PDF，全部都在你的瀏覽器裡完成。本站沒有後端伺服器，也不會儲存任何照片，關閉網頁後照片就會從記憶體清除。<span data-ads-on hidden>本站的廣告由 Google 提供，我們不會把照片或證件內容提供給 Google 或任何第三方。</span></p>
+        </details>
+        <details class="faq__item">
+          <summary>怎麼拍比較清楚？</summary>
+          <p>把證件放在深色、素色的桌面上，從正上方拍，讓四個角都入鏡。光線要充足，但避免燈光或閃光燈造成反光。拍完後如果四個角沒有對齊，可以按「調整」手動拖曳。</p>
+        </details>
+        <details class="faq__item">
+          <summary>為什麼要加浮水印？</summary>
+          <p>證件影本可能被拿去冒用，例如申辦門號或貸款。在影本上註明用途與日期，例如「僅供○○銀行開戶使用，他用無效」，可以降低被挪作他用的風險。</p>
+        </details>
+        <details class="faq__item">
+          <summary>列印出來的大小不對？</summary>
+          <p>PDF 預設是證件的實際大小。列印時請在列印設定選「實際大小」或「100%」，不要選「符合頁面大小」，印出來就會和正本一樣大。</p>
+        </details>
+        <details class="faq__item">
+          <summary>可以放哪些證件？</summary>
+          <p>身分證、健保卡、駕照、行照、存摺封面，以及可自訂尺寸的其他文件。多份證件會排在同一份 PDF，放不下時自動換頁。</p>
+        </details>
+      </div>
+    </section>
+
     <footer class="container footer">
+      <p>本工具為開放原始碼，所有運算都在瀏覽器中執行，照片不會上傳。<span data-ads-off>不使用任何廣告、追蹤或分析服務。</span><span data-ads-on hidden>本站以 Google 廣告維持營運。</span></p>
       <p>
-        本工具為開放原始碼，所有運算都在瀏覽器中執行，不使用任何追蹤或分析服務。
-        <a href="https://github.com/Arthur88Hsu/photo-to-pdf" rel="noopener noreferrer">GitHub 原始碼</a>
+        <a href="privacy.html">隱私權政策</a>
+        · <a href="https://github.com/Arthur88Hsu/photo-to-pdf" rel="noopener noreferrer">GitHub 原始碼</a>
         · 版本 <span id="app-version">dev</span>
       </p>
     </footer>

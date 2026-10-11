@@ -38,12 +38,14 @@ test('重複執行不會疊加版本號', () => {
   assert.equal(stampHtml(html, 'v1').count, 0);
 });
 
-test('實際網站：index.html 的 CSS、JS 與每個模組的所有 import 都會加上版本號', () => {
-  const html = readFileSync(new URL('index.html', SITE), 'utf8');
-  const stamped = stampHtml(html, 'v1');
-  assert.ok(stamped.html.includes('css/style.css?v=v1'));
-  assert.ok(stamped.html.includes('js/app.js?v=v1'));
-  assert.ok(stamped.html.includes('id="app-version">v1<'), '頁尾要有 id="app-version" 的版本欄位');
+test('實際網站：每個頁面的 CSS、JS 與每個模組的所有 import 都會加上版本號', () => {
+  for (const name of readdirSync(SITE).filter((file) => file.endsWith('.html'))) {
+    const stamped = stampHtml(readFileSync(new URL(name, SITE), 'utf8'), 'v1');
+    assert.ok(stamped.html.includes('css/style.css?v=v1'), `${name} 的 CSS 沒加到版本號`);
+    assert.ok(stamped.html.includes('id="app-version">v1<'), `${name} 頁尾要有 id="app-version" 的版本欄位`);
+    assert.ok(!/(?:href|src)="(?!https?:)[^"?]+\.(?:css|js)"/.test(stamped.html), `${name} 還有沒加版本號的資源`);
+  }
+  assert.ok(stampHtml(readFileSync(new URL('index.html', SITE), 'utf8'), 'v1').html.includes('js/app.js?v=v1'));
 
   for (const name of readdirSync(new URL('js/', SITE)).filter((file) => file.endsWith('.js'))) {
     const source = readFileSync(new URL(`js/${name}`, SITE), 'utf8');

@@ -673,6 +673,11 @@ el.download.addEventListener('click', onDownload);
 el.share.addEventListener('click', onShare);
 el.share.hidden = !canShareFiles;
 
+// 廣告：部署時在 adsense.json 設定了廣告單元，<ins> 才會有 data-ad-client（見 scripts/configure-ads.mjs）
+for (const unit of $$('ins.adsbygoogle')) {
+  if (unit.dataset.adClient) (window.adsbygoogle = window.adsbygoogle || []).push({});
+}
+
 // 預覽區寬度改變（旋轉手機、調整視窗）時重畫
 let previewWidth = 0;
 new ResizeObserver(() => {

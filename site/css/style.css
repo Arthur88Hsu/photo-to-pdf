@@ -906,6 +906,107 @@ a {
   text-align: center;
 }
 
+.footer p {
+  margin: 4px 0;
+}
+
+/* ---------- 廣告版位 ---------- */
+.ad-slot {
+  min-width: 0;
+  padding: 10px 16px 16px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.ad-slot__label {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+/* AdSense 範例程式碼用 style="display:block"，改用 class 才符合本站不允許行內樣式的設定 */
+.adsbygoogle {
+  display: block;
+  min-height: 100px;
+}
+
+/* ---------- 常見問題 ---------- */
+.faq {
+  padding-bottom: 16px;
+}
+
+.faq .panel__title {
+  margin-bottom: 4px;
+}
+
+.faq__item + .faq__item {
+  border-top: 1px solid var(--border);
+}
+
+.faq__item > summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  font-weight: 600;
+  list-style: none;
+  cursor: pointer;
+}
+
+.faq__item > summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq__item > summary::after {
+  content: "＋";
+  color: var(--primary);
+}
+
+.faq__item[open] > summary::after {
+  content: "－";
+}
+
+.faq__item p {
+  margin: 0 0 14px;
+  color: var(--text-muted);
+}
+
+/* ---------- 說明頁（隱私權政策） ---------- */
+.app-back {
+  margin: 0 0 6px;
+}
+
+.app-back a {
+  color: #ffffff;
+  text-decoration: none;
+  opacity: 0.9;
+}
+
+.doc-page {
+  padding-block: 16px 24px;
+}
+
+.prose {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+.prose h2 {
+  margin: 24px 0 8px;
+  font-size: 1.1rem;
+}
+
+.prose h2:first-child {
+  margin-top: 0;
+}
+
+.prose ul {
+  padding-left: 1.4em;
+}
+
 /* ---------- 裁切編輯器 ---------- */
 .cropper {
   width: 100vw;
