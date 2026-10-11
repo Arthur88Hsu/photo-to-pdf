@@ -172,10 +172,15 @@ function createDocElement(doc) {
   doc.sides.forEach((side, index) => {
     const sideNode = el.tplSide.content.firstElementChild.cloneNode(true);
     sideNode.dataset.side = index;
-    const input = $('.side__input', sideNode);
-    input.id = `photo-${doc.id}-${index}`;
-    input.setAttribute('aria-label', `${doc.label}${side.name}照片`);
-    $$('label.side__pick', sideNode).forEach((label) => (label.htmlFor = input.id));
+    for (const [kind, action] of [
+      ['camera', '拍照'],
+      ['gallery', '選擇照片'],
+    ]) {
+      const input = $(`.side__input--${kind}`, sideNode);
+      input.id = `photo-${doc.id}-${index}-${kind}`;
+      input.setAttribute('aria-label', `${doc.label}${side.name}：${action}`);
+      $$(`label[data-pick="${kind}"]`, sideNode).forEach((label) => (label.htmlFor = input.id));
+    }
     $$('.side__name', sideNode).forEach((name) => (name.textContent = side.name));
     sides.append(sideNode);
   });

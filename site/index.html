@@ -50,6 +50,11 @@
         <path d="M4 8h3l1.6-2.4A1.3 1.3 0 0 1 9.7 5h4.6a1.3 1.3 0 0 1 1.1.6L17 8h3a1 1 0 0 1 1 1v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5V9a1 1 0 0 1 1-1z" />
         <circle cx="12" cy="13.5" r="3.5" />
       </symbol>
+      <symbol id="i-image" viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <circle cx="8.5" cy="9.5" r="1.5" />
+        <path d="M21 15.5l-5-5L5 20" />
+      </symbol>
       <symbol id="i-rotate-left" viewBox="0 0 24 24">
         <path d="M3 4v6h6" />
         <path d="M5.6 15a8 8 0 1 0 1.9-8.3L3 10" />
@@ -258,11 +263,21 @@
     <template id="tpl-side">
       <div class="side">
         <div class="side__name"></div>
-        <input class="side__input visually-hidden" type="file" accept="image/*" />
-        <label class="side__empty side__pick">
-          <svg class="icon icon--lg" aria-hidden="true"><use href="#i-camera" /></svg>
-          <span class="side__hint">拍照或選擇照片</span>
-        </label>
+        <!-- capture 會直接開啟後鏡頭拍照；沒有 capture 的則開啟相簿（桌機為選擇檔案） -->
+        <input class="side__input side__input--camera visually-hidden" type="file" accept="image/*" capture="environment" />
+        <input class="side__input side__input--gallery visually-hidden" type="file" accept="image/*" />
+        <div class="side__empty">
+          <label class="pick-btn pick-camera" data-pick="camera">
+            <svg class="icon icon--lg" aria-hidden="true"><use href="#i-camera" /></svg>
+            <span>拍照</span>
+          </label>
+          <label class="pick-btn" data-pick="gallery">
+            <svg class="icon icon--lg" aria-hidden="true"><use href="#i-image" /></svg>
+            <span class="only-touch">從相簿選擇</span>
+            <span class="only-desktop">選擇照片</span>
+            <span class="side__hint only-desktop">或把照片拖曳到這裡</span>
+          </label>
+        </div>
         <div class="side__filled">
           <button type="button" class="side__preview" data-action="adjust" title="調整範圍">
             <canvas class="side__thumb" role="img"></canvas>
@@ -271,8 +286,12 @@
             <button type="button" class="tool-btn" data-action="adjust">
               <svg class="icon" aria-hidden="true"><use href="#i-crop" /></svg>調整
             </button>
-            <label class="tool-btn side__pick">
+            <label class="tool-btn pick-camera" data-pick="camera">
               <svg class="icon" aria-hidden="true"><use href="#i-camera" /></svg>重拍
+            </label>
+            <label class="tool-btn" data-pick="gallery">
+              <svg class="icon" aria-hidden="true"><use href="#i-image" /></svg
+              ><span class="only-touch">相簿</span><span class="only-desktop">更換</span>
             </label>
             <button type="button" class="tool-btn" data-action="clear-side">
               <svg class="icon" aria-hidden="true"><use href="#i-trash" /></svg>刪除

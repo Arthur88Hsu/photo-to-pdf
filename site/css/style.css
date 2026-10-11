@@ -662,26 +662,55 @@ a {
 }
 
 .side__empty {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  aspect-ratio: var(--aspect, 85.6 / 54);
+  overflow: hidden;
+  border: 2px dashed var(--border-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  transition: border-color 0.15s;
+}
+
+.pick-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  aspect-ratio: var(--aspect, 85.6 / 54);
+  gap: 4px;
+  min-width: 0;
   padding: 8px;
-  border: 2px dashed var(--border-strong);
-  border-radius: 12px;
-  background: var(--surface);
-  color: var(--text-muted);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
   text-align: center;
   cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background-color 0.15s;
+  transition: background-color 0.15s;
 }
 
-.side__empty .icon {
+.pick-btn.pick-camera {
+  border-right: 2px dashed var(--border-strong);
+}
+
+.pick-btn .icon {
   color: var(--primary);
+}
+
+.side.is-dragover .pick-btn {
+  background: var(--primary-soft);
+}
+
+/* 只在能懸停的裝置加 hover 效果，避免手機點按後底色一直停留 */
+@media (hover: hover) {
+  .pick-btn:hover {
+    background: var(--primary-soft);
+  }
+}
+
+.side.is-dragover .side__empty {
+  border-color: var(--primary);
 }
 
 .side__name {
@@ -691,19 +720,16 @@ a {
 }
 
 .side__hint {
+  color: var(--text-muted);
   font-size: 0.8rem;
-  line-height: 1.3;
+  font-weight: 400;
 }
 
-.side__empty:hover,
-.side.is-dragover .side__empty {
-  border-color: var(--primary);
-  background: var(--primary-soft);
-}
-
-.side__input:focus-visible ~ .side__empty {
+/* 輸入框是隱藏的，鍵盤聚焦時把外框畫在對應的按鈕上 */
+.side__input--camera:focus-visible ~ * [data-pick="camera"],
+.side__input--gallery:focus-visible ~ * [data-pick="gallery"] {
   outline: 3px solid var(--focus);
-  outline-offset: 2px;
+  outline-offset: -3px;
 }
 
 .side.has-image .side__empty,
@@ -754,20 +780,41 @@ a {
     flex: 1 0 100%;
     max-width: none;
   }
+}
 
-  /* 工具按鈕改成圖示在上、文字在下，三顆排得下一列 */
-  .side__tools .tool-btn {
-    flex-direction: column;
-    gap: 1px;
-    min-width: 44px;
-    padding: 4px;
-    font-size: 0.72rem;
-    line-height: 1.2;
+@media (max-width: 559px) {
+  /* 手機上正反面改成上下排列，按鈕與預覽圖都比較大 */
+  .doc__sides {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* 「拍照」只在觸控裝置（手機、平板）出現；桌機上 capture 屬性沒有作用 */
+.side .pick-camera,
+.side .side__input--camera,
+.only-touch {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .side__empty .pick-camera {
+    display: flex;
   }
 
-  .side__tools .tool-btn .icon {
-    width: 18px;
-    height: 18px;
+  .side__tools .pick-camera {
+    display: inline-flex;
+  }
+
+  .side .side__input--camera {
+    display: block;
+  }
+
+  .only-touch {
+    display: inline;
+  }
+
+  .only-desktop {
+    display: none;
   }
 }
 
