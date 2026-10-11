@@ -2,7 +2,7 @@
 // 所有處理都在瀏覽器內完成，照片不會上傳（index.html 的 CSP 也禁止了任何網路連線）。
 import { Cropper } from './cropper.js';
 import { detectDocument } from './detect.js';
-import { CUSTOM_SIZE_LIMITS, DOC_TYPES, SIDE_NAMES, SIZE_PRESETS, findPreset } from './documents.js';
+import { CUSTOM_SIZE_LIMITS, DOC_TYPES, SIZE_PRESETS, findPreset } from './documents.js';
 import { composeWatermarkText, defaultFileName, sanitizeFileName } from './format.js';
 import { defaultQuad } from './geometry.js';
 import {
@@ -86,7 +86,7 @@ function addDoc(typeId) {
     widthMm: preset.widthMm,
     heightMm: preset.heightMm,
     radiusMm: preset.radiusMm,
-    sides: SIDE_NAMES.map((name) => ({ name, file: null, image: null, imageId: 0, rotation: 0, corners: null })),
+    sides: type.sides.map((name) => ({ name, file: null, image: null, imageId: 0, rotation: 0, corners: null })),
   };
   state.docs.push(doc);
   const node = createDocElement(doc);

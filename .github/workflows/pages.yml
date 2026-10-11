@@ -55,6 +55,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      # 為 CSS、JS 網址加上這次的版本號，避免瀏覽器把新版 HTML 搭配到快取中的舊版 JS／CSS
+      - name: Stamp version
+        run: node scripts/stamp-version.mjs site "${GITHUB_SHA::7}"
+
       - name: Setup Pages
         uses: actions/configure-pages@v6
 

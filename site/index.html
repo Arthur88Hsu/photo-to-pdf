@@ -13,7 +13,7 @@
     <meta name="theme-color" content="#0f766e" />
     <meta
       name="description"
-      content="拍下身分證、健保卡、駕照、行照，自動拉正並排成 A4 PDF，可加上浮水印。全部在瀏覽器內完成，照片不會上傳。"
+      content="拍下身分證、健保卡、駕照、行照、存摺，自動拉正並排成 A4 PDF，可加上浮水印。全部在瀏覽器內完成，照片不會上傳。"
     />
     <title>證件照轉 PDF</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
@@ -41,6 +41,10 @@
         <path d="M3 16h18v2.5a.5.5 0 0 1-.5.5H18M6 19H3.5a.5.5 0 0 1-.5-.5V16M4 12.5h16" />
         <circle cx="7.5" cy="16" r="1.6" />
         <circle cx="16.5" cy="16" r="1.6" />
+      </symbol>
+      <symbol id="i-bank" viewBox="0 0 24 24">
+        <path d="M3 9.5 12 4l9 5.5M4 20h16M5 17h14" />
+        <path d="M6.5 10.5v6M10 10.5v6M14 10.5v6M17.5 10.5v6" />
       </symbol>
       <symbol id="i-doc" viewBox="0 0 24 24">
         <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
@@ -96,7 +100,7 @@
     <header class="app-header">
       <div class="container">
         <h1 class="app-title">證件照轉 PDF</h1>
-        <p class="app-subtitle">拍下身分證、健保卡、駕照、行照，自動拉正並排成 A4 PDF，還能加上浮水印。</p>
+        <p class="app-subtitle">拍下身分證、健保卡、駕照、行照、存摺，自動拉正並排成 A4 PDF，還能加上浮水印。</p>
         <p class="privacy">
           <svg class="icon" aria-hidden="true"><use href="#i-lock" /></svg>
           照片只在本機處理，不會上傳到任何伺服器
@@ -109,7 +113,7 @@
         <section class="panel" aria-labelledby="step-docs">
           <h2 id="step-docs" class="panel__title"><span class="step">1</span>選擇證件並拍照</h2>
           <div id="doc-types" class="type-grid" role="group" aria-label="新增證件"></div>
-          <p id="doc-empty" class="empty-hint">點選上方的證件種類，再為正面、反面拍照或選擇照片。</p>
+          <p id="doc-empty" class="empty-hint">點選上方的證件種類，再為每一面拍照或選擇照片。</p>
           <ol id="doc-list" class="doc-list"></ol>
         </section>
 
@@ -240,6 +244,7 @@
       <p>
         本工具為開放原始碼，所有運算都在瀏覽器中執行，不使用任何追蹤或分析服務。
         <a href="https://github.com/Arthur88Hsu/photo-to-pdf" rel="noopener noreferrer">GitHub 原始碼</a>
+        · 版本 <span id="app-version">dev</span>
       </p>
     </footer>
 

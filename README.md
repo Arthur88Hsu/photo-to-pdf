@@ -7,7 +7,7 @@
 
 ## 功能
 
-- **多種證件**：身分證、健保卡、駕照、行照，以及可自訂尺寸的其他證件；每份證件可放正面、反面
+- **多種證件**：身分證、健保卡、駕照、行照、存摺（只需封面），以及可自訂尺寸的其他證件；證件可放正面、反面
 - **拍照或從相簿選擇**：手機上每一面都有「拍照」（直接開啟後鏡頭）與「從相簿選擇」兩個按鈕；桌機可選檔或把照片拖進格子
 - **自動拉正**：自動偵測證件邊緣，也可手動拖曳四個角（附放大鏡）；斜拍的照片會做透視校正，並可旋轉
 - **實際尺寸排版**：依證件實際大小排到 A4（可放大 150%／200%），正反面可左右並排或上下排列，放不下自動換頁
@@ -39,6 +39,7 @@ site/                      網站本體（GitHub Pages 只發布這個資料夾�
     ├── image.js           照片讀取與畫布工具
     ├── documents.js       證件種類與尺寸
     └── format.js          日期、浮水印文字、檔名
+scripts/stamp-version.mjs  部署時為 CSS、JS 網址加上版本號（避免快取到舊檔）
 tests/                     單元測試（Node.js 內建 test runner）
 .github/workflows/pages.yml  GitHub Actions：測試 → 部署
 ```
@@ -84,7 +85,7 @@ npm test
 | 手動執行（Actions → Run workflow） | ✅ | ✅（在 `main` 上執行時） |
 
 - **Unit tests**：以 Node.js 執行 `npm test`；測試失敗就不會部署。
-- **Deploy to GitHub Pages**：只把 `site/` 資料夾打包上傳並部署；權限只開 `pages: write` 與 `id-token: write`。
+- **Deploy to GitHub Pages**：先替 CSS、JS 網址加上這次的版本號（例如 `app.js?v=df37eaa`），再只把 `site/` 資料夾打包上傳並部署；權限只開 `pages: write` 與 `id-token: write`。
 - **concurrency**：同一時間只會有一個部署在跑，進行中的部署不會被中斷。
 
 ### 常見問題
@@ -93,7 +94,8 @@ npm test
 - **`Branch "xxx" is not allowed to deploy to github-pages due to environment protection rules`**：
   `github-pages` 環境預設只允許 `main` 部署；若要從其他分支部署，到 **Settings → Environments → github-pages** 調整。
 - **`Unable to resolve action`**：表示指定的 action 版本不存在，把該行的版本號改回前一版（例如 `@v5` 改 `@v4`）即可。
-- **部署成功但網頁沒更新**：GitHub Pages 有約 10 分鐘快取，重新整理（或強制重新整理）即可。
+- **部署成功但網頁沒更新**：瀏覽器可能還在用快取的舊網頁，重新整理即可。頁尾會顯示目前載入的版本（commit 前 7 碼），可以和最新的 commit 對照。
+- **更新後畫面錯亂、按鈕沒反應**：新版網頁搭配到快取中的舊版 JS／CSS 才會這樣。部署時已自動在網址加上版本號避免這個問題；若仍發生，關掉分頁重新開啟即可。
 
 ## 證件尺寸
 
@@ -102,8 +104,9 @@ npm test
 | 身分證、健保卡、駕照 | 85.6 × 54 mm（ISO/IEC 7810 ID-1 標準卡片） |
 | 汽車行照 | 145 × 100 mm |
 | 機車行照 | 93 × 67 mm |
+| 存摺（只有封面） | 140 × 90 mm |
 
-行照沒有公開的官方規格，以上為參考值。若與手上的證件不符，可在該證件的尺寸選單選「自訂尺寸」，輸入實際量測的長寬。
+行照、存摺沒有公開的官方規格（存摺各銀行也略有不同），以上為參考值。若與手上的證件不符，可在該證件的尺寸選單選「自訂尺寸」，輸入實際量測的長寬。
 
 ## 瀏覽器支援
 
