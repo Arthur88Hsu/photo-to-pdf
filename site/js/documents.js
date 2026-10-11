@@ -1,0 +1,26 @@
+// 證件種類與尺寸（單位：mm）。
+// 身分證、健保卡、駕照為 ISO/IEC 7810 ID-1 卡片尺寸（與信用卡相同）。
+// 行照沒有公開的官方規格，以下為實物量測的參考值；若與手上的證件不同，可在畫面上選「自訂尺寸」。
+
+export const SIZE_PRESETS = [
+  { id: 'card', label: '標準卡片', widthMm: 85.6, heightMm: 54, radiusMm: 3.18 },
+  { id: 'car', label: '汽車行照', widthMm: 145, heightMm: 100, radiusMm: 0 },
+  { id: 'scooter', label: '機車行照', widthMm: 93, heightMm: 67, radiusMm: 0 },
+];
+
+export const DOC_TYPES = [
+  { id: 'id-card', label: '身分證', icon: 'i-id', preset: 'card' },
+  { id: 'nhi-card', label: '健保卡', icon: 'i-health', preset: 'card' },
+  { id: 'driver-license', label: '駕照', icon: 'i-license', preset: 'card' },
+  { id: 'vehicle-license', label: '行照', icon: 'i-car', preset: 'car' },
+  { id: 'other', label: '其他證件', icon: 'i-doc', preset: 'card' },
+];
+
+export const SIDE_NAMES = ['正面', '反面'];
+
+/** 自訂尺寸允許的範圍（mm） */
+export const CUSTOM_SIZE_LIMITS = { min: 20, max: 297 };
+
+export function findPreset(id) {
+  return SIZE_PRESETS.find((preset) => preset.id === id);
+}

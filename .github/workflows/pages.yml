@@ -1,40 +1,69 @@
 name: Deploy GitHub Pages
 
+# 觸發時機：
+# - push 到 main：先跑測試，通過後部署到 GitHub Pages
+# - 對 main 開 Pull Request：只跑測試，不部署
+# - 手動執行：Actions 分頁 → Deploy GitHub Pages → Run workflow
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
+# 預設只給讀取權限，需要更多權限的 job 再個別開
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      # 使用 Node.js 內建的 test runner，不需要 npm install
+      - name: Run tests
+        run: npm test
+
   deploy:
+    name: Deploy to GitHub Pages
+    needs: test
+    # 只有 main 分支會部署（PR 的 ref 是 refs/pull/...，會被略過）
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write # 部署到 GitHub Pages
+      id-token: write # 以 OIDC 驗證部署來源
+    # 同一時間只跑一個部署；排隊中的會被較新的取代，但進行中的部署不會被中斷
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
-    runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
-          path: '.'
+          # 只發布網站本體，測試與設定檔不會被公開
+          path: site
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

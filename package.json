@@ -1,0 +1,14 @@
+{
+  "name": "photo-to-pdf",
+  "version": "1.0.0",
+  "private": true,
+  "description": "拍攝台灣證件照片並轉成 A4 PDF，可加浮水印（純前端，照片不離開瀏覽器）",
+  "type": "module",
+  "scripts": {
+    "start": "npx --yes http-server site -p 8000 -c-1",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

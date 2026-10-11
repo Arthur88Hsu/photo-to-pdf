@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- 禁止任何網路連線（connect-src 'none'）：照片只在瀏覽器內處理，技術上不可能被上傳 -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0f766e" />
+    <meta
+      name="description"
+      content="拍下身分證、健保卡、駕照、行照，自動拉正並排成 A4 PDF，可加上浮水印。全部在瀏覽器內完成，照片不會上傳。"
+    />
+    <title>證件照轉 PDF</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script type="module" src="js/app.js"></script>
+  </head>
+  <body>
+    <svg class="sprite" aria-hidden="true">
+      <symbol id="i-id" viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <circle cx="8" cy="11" r="2" />
+        <path d="M4.8 16c.6-1.4 1.8-2.2 3.2-2.2s2.6.8 3.2 2.2M14 10h5M14 14h3.5" />
+      </symbol>
+      <symbol id="i-health" viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <path d="M12 8.5v7M8.5 12h7" />
+      </symbol>
+      <symbol id="i-license" viewBox="0 0 24 24">
+        <rect x="2" y="5" width="20" height="14" rx="2" />
+        <circle cx="8.5" cy="12" r="3" />
+        <path d="M8.5 9v6M5.5 12h6M14.5 10h4.5M14.5 14h3" />
+      </symbol>
+      <symbol id="i-car" viewBox="0 0 24 24">
+        <path d="M4 16v-3.5L6 7.5A2 2 0 0 1 7.9 6h8.2A2 2 0 0 1 18 7.5l2 5V16" />
+        <path d="M3 16h18v2.5a.5.5 0 0 1-.5.5H18M6 19H3.5a.5.5 0 0 1-.5-.5V16M4 12.5h16" />
+        <circle cx="7.5" cy="16" r="1.6" />
+        <circle cx="16.5" cy="16" r="1.6" />
+      </symbol>
+      <symbol id="i-doc" viewBox="0 0 24 24">
+        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+        <path d="M14 3v5h5M9 13h6M9 17h4" />
+      </symbol>
+      <symbol id="i-camera" viewBox="0 0 24 24">
+        <path d="M4 8h3l1.6-2.4A1.3 1.3 0 0 1 9.7 5h4.6a1.3 1.3 0 0 1 1.1.6L17 8h3a1 1 0 0 1 1 1v9.5a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5V9a1 1 0 0 1 1-1z" />
+        <circle cx="12" cy="13.5" r="3.5" />
+      </symbol>
+      <symbol id="i-rotate-left" viewBox="0 0 24 24">
+        <path d="M3 4v6h6" />
+        <path d="M5.6 15a8 8 0 1 0 1.9-8.3L3 10" />
+      </symbol>
+      <symbol id="i-rotate-right" viewBox="0 0 24 24">
+        <path d="M21 4v6h-6" />
+        <path d="M18.4 15a8 8 0 1 1-1.9-8.3L21 10" />
+      </symbol>
+      <symbol id="i-expand" viewBox="0 0 24 24">
+        <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+      </symbol>
+      <symbol id="i-target" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="8" />
+        <circle cx="12" cy="12" r="3" />
+      </symbol>
+      <symbol id="i-crop" viewBox="0 0 24 24">
+        <path d="M6 2v14a2 2 0 0 0 2 2h14" />
+        <path d="M18 22V8a2 2 0 0 0-2-2H2" />
+      </symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24">
+        <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12.2A2 2 0 0 0 9 21h6a2 2 0 0 0 2-1.8L18 7M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7" />
+      </symbol>
+      <symbol id="i-x" viewBox="0 0 24 24">
+        <path d="M6 6l12 12M18 6L6 18" />
+      </symbol>
+      <symbol id="i-download" viewBox="0 0 24 24">
+        <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+      </symbol>
+      <symbol id="i-share" viewBox="0 0 24 24">
+        <path d="M12 3v13M7.5 7.5 12 3l4.5 4.5" />
+        <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />
+      </symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24">
+        <rect x="5" y="11" width="14" height="10" rx="2" />
+        <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+      </symbol>
+    </svg>
+
+    <header class="app-header">
+      <div class="container">
+        <h1 class="app-title">證件照轉 PDF</h1>
+        <p class="app-subtitle">拍下身分證、健保卡、駕照、行照，自動拉正並排成 A4 PDF，還能加上浮水印。</p>
+        <p class="privacy">
+          <svg class="icon" aria-hidden="true"><use href="#i-lock" /></svg>
+          照片只在本機處理，不會上傳到任何伺服器
+        </p>
+      </div>
+    </header>
+
+    <main class="container layout">
+      <div class="layout__main">
+        <section class="panel" aria-labelledby="step-docs">
+          <h2 id="step-docs" class="panel__title"><span class="step">1</span>選擇證件並拍照</h2>
+          <div id="doc-types" class="type-grid" role="group" aria-label="新增證件"></div>
+          <p id="doc-empty" class="empty-hint">點選上方的證件種類，再為正面、反面拍照或選擇照片。</p>
+          <ol id="doc-list" class="doc-list"></ol>
+        </section>
+
+        <section class="panel" aria-labelledby="step-watermark">
+          <h2 id="step-watermark" class="panel__title"><span class="step">2</span>加上浮水印</h2>
+          <label class="field__label" for="wm-text">浮水印文字</label>
+          <input
+            id="wm-text"
+            class="input"
+            type="text"
+            maxlength="60"
+            autocomplete="off"
+            placeholder="例如：僅供○○銀行開戶使用"
+          />
+          <div id="wm-templates" class="chips" role="group" aria-label="常用浮水印文字">
+            <button type="button" class="chip" data-template="僅供○○使用，他用無效">僅供○○使用，他用無效</button>
+            <button type="button" class="chip" data-template="僅供○○申請○○使用">僅供○○申請○○使用</button>
+            <button type="button" class="chip" data-template="本影本僅供○○核對身分">本影本僅供○○核對身分</button>
+          </div>
+          <label class="check">
+            <input id="wm-date" type="checkbox" />
+            <span>在文字後面加上今天日期</span>
+          </label>
+
+          <details class="more">
+            <summary>浮水印樣式</summary>
+            <div class="more__body">
+              <fieldset class="field">
+                <legend class="field__label">顏色</legend>
+                <div class="swatches">
+                  <label class="swatch swatch--red"
+                    ><input type="radio" name="wm-color" value="#c62828" checked /><span>紅</span></label
+                  >
+                  <label class="swatch swatch--black"
+                    ><input type="radio" name="wm-color" value="#1f2937" /><span>黑</span></label
+                  >
+                  <label class="swatch swatch--blue"
+                    ><input type="radio" name="wm-color" value="#1d4ed8" /><span>藍</span></label
+                  >
+                  <label class="swatch swatch--gray"
+                    ><input type="radio" name="wm-color" value="#6b7280" /><span>灰</span></label
+                  >
+                </div>
+              </fieldset>
+              <div class="range">
+                <label for="wm-opacity" class="field__label">不透明度</label>
+                <input id="wm-opacity" type="range" min="10" max="90" step="5" value="35" />
+                <output for="wm-opacity"></output>
+              </div>
+              <div class="range">
+                <label for="wm-size" class="field__label">字體大小</label>
+                <input id="wm-size" type="range" min="8" max="36" step="1" value="14" />
+                <output for="wm-size"></output>
+              </div>
+              <div class="range">
+                <label for="wm-angle" class="field__label">傾斜角度</label>
+                <input id="wm-angle" type="range" min="0" max="60" step="5" value="30" />
+                <output for="wm-angle"></output>
+              </div>
+              <fieldset class="field">
+                <legend class="field__label">範圍</legend>
+                <div class="segmented">
+                  <label><input type="radio" name="wm-scope" value="card" checked /><span>只蓋在證件上</span></label>
+                  <label><input type="radio" name="wm-scope" value="page" /><span>整張 A4</span></label>
+                </div>
+              </fieldset>
+            </div>
+          </details>
+        </section>
+
+        <section class="panel" aria-labelledby="step-layout">
+          <h2 id="step-layout" class="panel__title"><span class="step">3</span>版面設定</h2>
+          <fieldset class="field">
+            <legend class="field__label">正反面排列</legend>
+            <div class="segmented">
+              <label><input type="radio" name="arrangement" value="row" checked /><span>左右並排</span></label>
+              <label><input type="radio" name="arrangement" value="column" /><span>上下排列</span></label>
+            </div>
+          </fieldset>
+          <div class="grid-2">
+            <label class="field">
+              <span class="field__label">列印大小</span>
+              <select id="scale" class="input">
+                <option value="1" selected>實際大小（100%）</option>
+                <option value="1.5">放大 150%</option>
+                <option value="2">放大 200%</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field__label">PDF 畫質</span>
+              <select id="dpi" class="input">
+                <option value="150">一般（150 dpi，檔案較小）</option>
+                <option value="200" selected>清晰（200 dpi）</option>
+                <option value="300">最高（300 dpi）</option>
+              </select>
+            </label>
+          </div>
+          <label class="check">
+            <input id="grayscale" type="checkbox" />
+            <span>黑白輸出</span>
+          </label>
+        </section>
+      </div>
+
+      <aside class="panel layout__side" aria-labelledby="preview-title">
+        <div class="preview-head">
+          <h2 id="preview-title" class="panel__title">A4 預覽</h2>
+          <span id="page-count" class="muted"></span>
+        </div>
+        <div id="preview" class="preview"></div>
+        <label class="field__label" for="file-name">檔名</label>
+        <input id="file-name" class="input" type="text" autocomplete="off" spellcheck="false" />
+        <div class="export-bar">
+          <button id="btn-download" type="button" class="btn btn--primary btn--block" disabled>
+            <svg class="icon" aria-hidden="true"><use href="#i-download" /></svg>
+            下載 PDF
+          </button>
+          <button id="btn-share" type="button" class="btn btn--block" hidden disabled>
+            <svg class="icon" aria-hidden="true"><use href="#i-share" /></svg>
+            分享
+          </button>
+        </div>
+        <p id="export-status" class="muted export-status" role="status" aria-live="polite"></p>
+      </aside>
+    </main>
+
+    <footer class="container footer">
+      <p>
+        本工具為開放原始碼，所有運算都在瀏覽器中執行，不使用任何追蹤或分析服務。
+        <a href="https://github.com/Arthur88Hsu/photo-to-pdf" rel="noopener noreferrer">GitHub 原始碼</a>
+      </p>
+    </footer>
+
+    <template id="tpl-doc">
+      <li class="doc">
+        <div class="doc__head">
+          <h3 class="doc__title"></h3>
+          <select class="doc__preset input input--small"></select>
+          <button type="button" class="icon-btn" data-action="remove-doc">
+            <svg class="icon" aria-hidden="true"><use href="#i-x" /></svg>
+          </button>
+        </div>
+        <div class="doc__custom" hidden>
+          <label>寬 <input class="doc__width input input--small" type="number" inputmode="decimal" min="20" max="297" step="0.1" /> mm</label>
+          <label>高 <input class="doc__height input input--small" type="number" inputmode="decimal" min="20" max="297" step="0.1" /> mm</label>
+        </div>
+        <div class="doc__sides"></div>
+      </li>
+    </template>
+
+    <template id="tpl-side">
+      <div class="side">
+        <div class="side__name"></div>
+        <input class="side__input visually-hidden" type="file" accept="image/*" />
+        <label class="side__empty side__pick">
+          <svg class="icon icon--lg" aria-hidden="true"><use href="#i-camera" /></svg>
+          <span class="side__hint">拍照或選擇照片</span>
+        </label>
+        <div class="side__filled">
+          <button type="button" class="side__preview" data-action="adjust" title="調整範圍">
+            <canvas class="side__thumb" role="img"></canvas>
+          </button>
+          <div class="side__tools">
+            <button type="button" class="tool-btn" data-action="adjust">
+              <svg class="icon" aria-hidden="true"><use href="#i-crop" /></svg>調整
+            </button>
+            <label class="tool-btn side__pick">
+              <svg class="icon" aria-hidden="true"><use href="#i-camera" /></svg>重拍
+            </label>
+            <button type="button" class="tool-btn" data-action="clear-side">
+              <svg class="icon" aria-hidden="true"><use href="#i-trash" /></svg>刪除
+            </button>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <dialog id="cropper" class="cropper" aria-labelledby="cropper-title">
+      <div class="cropper__header">
+        <h2 id="cropper-title" class="cropper__title"></h2>
+        <p class="cropper__hint"></p>
+        <p class="cropper__warning" hidden>證件好像是直的？請按「左轉」或「右轉」把證件轉正。</p>
+      </div>
+      <div class="cropper__stage">
+        <canvas class="cropper__canvas"></canvas>
+        <canvas class="cropper__loupe" hidden></canvas>
+      </div>
+      <div class="cropper__tools">
+        <button type="button" class="tool-btn" data-crop-action="rotate-left">
+          <svg class="icon" aria-hidden="true"><use href="#i-rotate-left" /></svg>左轉
+        </button>
+        <button type="button" class="tool-btn" data-crop-action="rotate-right">
+          <svg class="icon" aria-hidden="true"><use href="#i-rotate-right" /></svg>右轉
+        </button>
+        <button type="button" class="tool-btn" data-crop-action="full">
+          <svg class="icon" aria-hidden="true"><use href="#i-expand" /></svg>整張照片
+        </button>
+        <button type="button" class="tool-btn" data-crop-action="reset">
+          <svg class="icon" aria-hidden="true"><use href="#i-target" /></svg>重設
+        </button>
+      </div>
+      <div class="cropper__actions">
+        <button type="button" class="btn" data-crop-action="cancel">取消</button>
+        <button type="button" class="btn btn--primary" data-crop-action="confirm">確定</button>
+      </div>
+    </dialog>
+
+    <div id="busy" class="busy" hidden>
+      <div class="busy__box" role="status" aria-live="polite">
+        <span class="spinner" aria-hidden="true"></span>
+        <span id="busy-text"></span>
+      </div>
+    </div>
+    <div id="toast" class="toast" role="alert" hidden></div>
+  </body>
+</html>
